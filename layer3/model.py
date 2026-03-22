@@ -1,0 +1,106 @@
+import mesa
+import pandas as pd
+import numpy as np
+import networkx as nx
+from agent import WorkforceAgent
+
+
+class WorkforceModel(mesa.Model):
+
+    def __init__(self, csv_path, scenario_config, rng=None):
+        super().__init__(rng=rng)
+        self.scenario = scenario_config
+        self.graph    = nx.Graph()
+
+        df = pd.read_csv('../workforce_v2_1000.csv')
+        for idx, row in df.iterrows():
+            agent = WorkforceAgent(idx, self, row, scenario_config)
+            self.graph.add_node(agent.unique_id)
+
+        self._seed_network(df)
+
+        self.datacollector = mesa.DataCollector(
+            model_reporters={
+                'adoption_rate'      : lambda m: m.get_adoption_rate(),
+                'productivity_delta' : lambda m: m.get_productivity_delta(),
+                'avg_frustration'    : lambda m: m.get_avg_frustration(),
+                'ticket_volume'      : lambda m: m.get_weekly_tickets(),
+                'network_density'    : lambda m: nx.density(m.graph),
+                'resistance_index'   : lambda m: m.get_resistance_index(),
+                'exs_score'          : lambda m: m.get_exs_score()
+            },
+            agent_reporters={
+                'persona'        : 'persona',
+                'gmm_cluster'    : 'gmm_cluster',
+                'adoption_stage' : 'adoption_stage',
+                'frustration'    : 'frustration',
+                'productivity'   : 'productivity',
+                'churn_risk'     : 'churn_risk',
+                'enps_norm'      : 'enps_norm',
+                'training_norm'  : 'training_norm',
+                'AI'             : 'AI'
+            }
+        )
+
+    def step(self):
+        # Collect BEFORE agents move so week 0 is captured
+        self.datacollector.collect(self)
+        # shuffle_do is the Mesa 3.x equivalent of RandomActivation
+        self.agents.shuffle_do('step')
+        self._update_network()
+
+    def run(self, n_steps=52):
+        for _ in range(n_steps):
+            self.step()
+        return self.datacollector.get_model_vars_dataframe()
+
+    #Aggregate reporters 
+    def get_adoption_rate(self):
+        adopted = self.agents.select(lambda a: a.adoption_stage >= 3)
+        return len(adopted) / len(self.agents)
+
+    def get_productivity_delta(self):
+        return float(np.mean([a.productivity for a in self.agents]))
+
+    def get_avg_frustration(self):
+        return float(np.mean([a.frustration for a in self.agents]))
+
+    def get_weekly_tickets(self):
+        return int(sum(a.tickets_this_week for a in self.agents))
+
+    def get_resistance_index(self):
+        # Only meaningful after week 8 — too early to call anyone chronically stuck
+        if self.steps < 8:
+            return 0.0
+        stuck = self.agents.select(lambda a: a.adoption_stage <= 1)
+        return len(stuck) / len(self.agents)
+
+    def get_exs_score(self):
+        scores = [
+            (1 - a.frustration)    * 0.35 +
+            (a.adoption_stage / 4) * 0.35 +
+            a.productivity         * 0.30
+            for a in self.agents
+        ]
+        return float(np.mean(scores) * 100)
+
+    #Network 
+    def _seed_network(self, df):
+        # Connect agents whose collab_density is above the median
+        median = df['collab_density'].median()
+        high   = df[df['collab_density'] > median].index.tolist()
+        for i in range(len(high)):
+            for j in range(i + 1, min(i + 4, len(high))):
+                self.graph.add_edge(high[i], high[j])
+
+    def _update_network(self):
+        # Advocates link to Trial-stage peers — accelerates social norm spread
+        advocates    = list(self.agents.select(lambda a: a.adoption_stage == 4))
+        trialing     = list(self.agents.select(lambda a: a.adoption_stage == 2))
+        if not trialing:
+            return
+        for adv in advocates:
+            peers = np.random.choice(trialing, size=min(2, len(trialing)), replace=False)
+            for peer in peers:
+                if not self.graph.has_edge(adv.unique_id, peer.unique_id):
+                    self.graph.add_edge(adv.unique_id, peer.unique_id)
