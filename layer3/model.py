@@ -2,17 +2,18 @@ import mesa
 import pandas as pd
 import numpy as np
 import networkx as nx
-from agent import WorkforceAgent
+from layer3.agent import WorkforceAgent
+from typing import cast
 
 
 class WorkforceModel(mesa.Model):
 
-    def __init__(self, csv_path, scenario_config, rng=None):
+    def __init__(self, scenario_config, rng):
         super().__init__(rng=rng)
         self.scenario = scenario_config
         self.graph    = nx.Graph()
 
-        df = pd.read_csv(r'layer2\workforce_v2_1000.csv')
+        df = pd.read_csv(r'./layer2/workforce_v2_1000.csv')
         for idx, row in df.iterrows():
             agent = WorkforceAgent(idx, self, row, scenario_config)
             self.graph.add_node(agent.unique_id)
@@ -56,30 +57,30 @@ class WorkforceModel(mesa.Model):
 
     #Aggregate reporters 
     def get_adoption_rate(self):
-        adopted = self.agents.select(lambda a: a.adoption_stage >= 3)
+        adopted = self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage >= 3)
         return len(adopted) / len(self.agents)
 
     def get_productivity_delta(self):   
-        return float(np.mean([a.productivity for a in self.agents]))
+        return float(np.mean([cast(WorkforceAgent, a).productivity for a in self.agents]))
 
     def get_avg_frustration(self):
-        return float(np.mean([a.frustration for a in self.agents]))
+        return float(np.mean([cast(WorkforceAgent, a).frustration for a in self.agents]))
 
     def get_weekly_tickets(self):
-        return int(sum(a.tickets_this_week for a in self.agents))
+        return int(sum(cast(WorkforceAgent, a).tickets_this_week for a in self.agents))
 
     def get_resistance_index(self):
         # Only meaningful after week 8 — too early to call anyone chronically stuck
         if self.steps < 8:
             return 0.0
-        stuck = self.agents.select(lambda a: a.adoption_stage <= 1)
+        stuck = self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage <= 1)
         return len(stuck) / len(self.agents)
 
     def get_exs_score(self):
         scores = [
-            (1 - a.frustration)    * 0.35 +
-            (a.adoption_stage / 4) * 0.35 +
-            a.productivity         * 0.30
+            (1 - cast(WorkforceAgent, a).frustration)    * 0.35 +
+            (cast(WorkforceAgent, a).adoption_stage / 4) * 0.35 +
+            cast(WorkforceAgent, a).productivity         * 0.30
             for a in self.agents
         ]
         return float(np.mean(scores) * 100)
@@ -97,8 +98,8 @@ class WorkforceModel(mesa.Model):
         # Advocates link to Trial-stage peers — accelerates social norm spread
         # every week, advocates(stage=4), attempt to add 2 edges to random trial-stage agents(stage=2)
         # this causes the network to grow organically
-        advocates    = list(self.agents.select(lambda a: a.adoption_stage == 4))
-        trialing     = list(self.agents.select(lambda a: a.adoption_stage == 2))
+        advocates    = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 4))
+        trialing     = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 2))
         if not trialing:
             return
         for adv in advocates:

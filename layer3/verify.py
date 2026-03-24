@@ -2,9 +2,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-sa = pd.read_csv('outputs/output_scenario_a.csv')
-sb = pd.read_csv('outputs/output_scenario_b.csv')
-sc = pd.read_csv('outputs/output_scenario_c.csv')
+sa = pd.read_csv('layer3/outputs/output_scenario_a.csv')
+sb = pd.read_csv('layer3/outputs/output_scenario_b.csv')
+sc = pd.read_csv('layer3/outputs/output_scenario_c.csv')
 
 # ── Check 1: Print key numbers ─────────────────────────────────────────────
 print('=== SCENARIO A (Big-bang + Chatbot) ===')
@@ -61,6 +61,6 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('outputs/verification_plot.png', dpi=150)
+plt.savefig('layer3/outputs/verification_plot.png', dpi=150)
 plt.show()
 print('\nPlot saved to outputs/verification_plot.png')

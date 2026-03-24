@@ -1,10 +1,12 @@
 # checkpoint.py — put this in your layer3/ folder and run it
 import pandas as pd
 import numpy as np
-from agent import WorkforceAgent
+import os
+from .agent import WorkforceAgent
 
 # Load one real row from the CSV
-df = pd.read_csv('../workforce_v2_1000.csv')
+csv_path = os.path.join(os.path.dirname(__file__), '..', 'layer2', 'workforce_v2_1000.csv')
+df = pd.read_csv(csv_path)
 
 # Pick a Reluctant User and a Tech Pioneer
 reluctant_row = df[df['persona'] == 'Reluctant User'].iloc[0]

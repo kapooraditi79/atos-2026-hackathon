@@ -1,16 +1,11 @@
 import mesa
 import numpy as np
+from typing import cast
 
 STAGE_NAMES = ['Awareness','Interest','Trial','Adoption','Advocacy']
 # agent.py — replace ADVANCE_THRESHOLD with these values
-ADVANCE_THRESHOLD = {
-    0: 0.44,   # Pragmatic Adopter      — crosses around week 10-15
-    1: 0.50,   # Elite                  — crosses week 1-2 in all scenarios
-    2: 0.45,   # Remote-First Worker    — crosses around week 10-15
-    3: 0.37,   # Reluctant User         — crosses week 15-25 depending on scenario
-    4: 0.51,   # Mainstream Power User  — crosses week 3-5
-}
-REVERT_THRESHOLD = {0:0.18, 1:0.10, 2:0.20, 3:0.25, 4:0.15}
+ADVANCE_THRESHOLD = {0: 0.44, 1: 0.36, 2: 0.44, 3: 0.52, 4: 0.40}
+REVERT_THRESHOLD  = {0: 0.18, 1: 0.10, 2: 0.20, 3: 0.25, 4: 0.15}
 
 class WorkforceAgent(mesa.Agent):
     def __init__(self, unique_id, model, row, scenario_config):
@@ -59,27 +54,25 @@ class WorkforceAgent(mesa.Agent):
         
     #Compute TAM
     def _compute_tam(self):
-        colleague_adoption = self.model.get_adoption_rate()
+        from layer3.model import WorkforceModel  # Import moved inside the method
+        colleague_adoption = cast(WorkforceModel, self.model).get_adoption_rate()
 
-        #PEOU = Perceived Ease of Use
-        effective_training = min(1.0,self.training_norm + self.training_boost*0.3)
-        PEOU = (
-            (self.digital_dexterity / 10) * 0.45 + effective_training * 0.20
-            + self.lms_completion * 0.15 + self.satisfaction_norm * 0.20
-            )
+    # PEOU — 3 per-agent inputs (dexterity, training, LMS readiness)
+        effective_training = min(1.0, self.training_norm + self.training_boost * 0.3)
+        PEOU = (self.digital_dexterity / 10) * 0.45 \
+         + effective_training           * 0.25 \
+         + self.lms_completion          * 0.30
 
-        #PU = Perceived Usefulness
-        PU = (1 - self.tool_complexity)*0.6 + colleague_adoption * 0.4
+    # PU — now per-agent: satisfaction captures "will this tool benefit MY job"
+    # satisfaction_norm already normalised (score/10) in __init__
+        PU = (1 - self.tool_complexity)    * 0.50 \
+       + colleague_adoption             * 0.30 \
+       + self.satisfaction_norm         * 0.20   # ← per-agent differentiator
 
-        #Social Norm: SN
-        # eNPS: how susceptible this agent is to peer influence (High eNPS = more open)
-        # collab_density: how many connections expose them to the social norm signal
-        # resistance: personal barrier that dampens the signal
-        collab_weight = 0.5 + self.collab_density * 0.5   # maps 0.21-0.68 → 0.61-0.84
+    # SN — unchanged from v4
+        collab_weight = 0.5 + self.collab_density * 0.5
         SN = colleague_adoption * (1 - self.resistance) * self.enps_norm * collab_weight
 
-        #Adoption Intention 
-        # Weights from King & He (2006) meta-analysis
         self.AI = 0.50 * PU + 0.30 * PEOU + 0.20 * SN
         
     def _update_adoption_stage(self):
