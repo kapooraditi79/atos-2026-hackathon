@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from model import WorkforceModel
 
-CSV = '../workforce_v2_1000.csv'
+CSV = 'layer2/workforce_v2_1000.csv'
 os.makedirs('outputs', exist_ok=True)
 
 #Scenario Configs 
@@ -136,8 +136,11 @@ if __name__ == '__main__':
 
     # Save outputs for Layer 4 and React dashboard
     sa.to_csv('outputs/output_scenario_a.csv', index=False)
+    agents_a.to_parquet('outputs/agents_a.parquet', index=False)
     sb.to_csv('outputs/output_scenario_b.csv', index=False)
+    agents_b.to_parquet('outputs/agents_b.parquet', index=False)
     sc.to_csv('outputs/output_scenario_c.csv', index=False)
+    agents_c.to_parquet('outputs/agents_c.parquet', index=False)
 
     print('\nOutputs saved to outputs/')
     print('Layer 3 complete.')

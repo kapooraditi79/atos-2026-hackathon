@@ -25,7 +25,7 @@ class WorkforceAgent(mesa.Agent):
         self.enps_norm = (float(row['enps_score'])+100) / 200
         self.collab_density = float(row['collab_density'])
         
-        #Other state variables
+        #Other state variables 
         self.persona = row['persona']
         self.support_dependency = float(row['support_dependency'])
         self.frustration = float(row['frustration_level'])
@@ -121,4 +121,6 @@ class WorkforceAgent(mesa.Agent):
         self.digital_dexterity = min(10.0, self.digital_dexterity + dex_gain)
 
     def _decay_frustration(self):
+        # 10% weekly decay of frustration 
+        # ensures half life of frustration ~6 weeks
         self.frustration *= 0.90
