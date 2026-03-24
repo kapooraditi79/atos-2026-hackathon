@@ -43,7 +43,9 @@ def run_monte_carlo(scenario_config, n_runs=30, n_steps=52):
         agent_result = model.datacollector.get_agent_vars_dataframe()
         agent_result['run'] = seed
         all_agent.append(agent_result)
-
+        agents_a.to_parquet('../outputs/agents_a.parquet')
+        agents_b.to_parquet('../outputs/agents_b.parquet')
+        agents_c.to_parquet('../outputs/agents_c.parquet')
     combined = pd.concat(all_model)
 
     summary = combined.groupby(combined.index).agg(
