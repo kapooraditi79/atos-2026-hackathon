@@ -6,7 +6,6 @@ from layer3.agent import WorkforceAgent
 from typing import cast
 
 CSV = 'layer2/workforce_v2_1000.csv'
-os.makedirs('outputs', exist_ok=True)
 os.makedirs('layer3/outputs', exist_ok=True)
 
 # ── Scenario Configs ─────────────────────────────────────────────────────────
@@ -67,7 +66,8 @@ def run_monte_carlo(scenario_config, n_runs=30, n_steps=52):
         tickets_mean      = ('ticket_volume',      'mean'),
         tickets_p95       = ('ticket_volume',       lambda x: np.percentile(x, 95)),
         exs_mean          = ('exs_score',           'mean'),
-        resistance_mean   = ('resistance_index',   'mean')
+        resistance_mean   = ('resistance_index',   'mean'),
+        network_density_mean = ('network_density',  'mean')
     ).reset_index(names='week')
 
     # ── FIX #1 (CRITICAL): productivity_mean is ABSOLUTE (≈0.63), not a delta.
@@ -199,9 +199,9 @@ if __name__ == '__main__':
     sc.to_csv('layer3/outputs/output_scenario_c.csv', index=False)
 
     # ── FIX #3: Save agent-level data to Parquet (was missing in v3)
-    agents_a.to_parquet('outputs/agents_a.parquet')
-    agents_b.to_parquet('outputs/agents_b.parquet')
-    agents_c.to_parquet('outputs/agents_c.parquet')
+    agents_a.to_parquet('layer3/outputs/agents_a.parquet')
+    agents_b.to_parquet('layer3/outputs/agents_b.parquet')
+    agents_c.to_parquet('layer3/outputs/agents_c.parquet')
 
     # ── NOTE: Curve labelling for Layer 4
     # - adoption_mean starts at ~0.40, NOT 0%, due to _init_stage() pre-seeding.
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     print('  layer3/outputs/output_scenario_a.csv')
     print('  layer3/outputs/output_scenario_b.csv')
     print('  layer3/outputs/output_scenario_c.csv')
-    print('  outputs/agents_a.parquet')
-    print('  outputs/agents_b.parquet')
-    print('  outputs/agents_c.parquet')
+    print('  layer3/outputs/agents_a.parquet')
+    print('  layer3/outputs/agents_b.parquet')
+    print('  layer3/outputs/agents_c.parquet')
     print('Layer 3 complete.')

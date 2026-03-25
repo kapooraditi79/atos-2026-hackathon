@@ -46,9 +46,14 @@ class WorkforceModel(mesa.Model):
     def step(self):
         # Collect BEFORE agents move so week 0 is captured
         self.datacollector.collect(self)
+        # Cache expensive aggregates once per step (avoid 1000× WeakKeyDictionary builds)
+        self._cached_adoption_rate = self._compute_adoption_rate()
+        self._agent_map = {a.unique_id: a for a in self.agents}
         # shuffle_do is the Mesa 3.x equivalent of RandomActivation
         self.agents.shuffle_do('step')
         self._update_network()
+        # Invalidate caches after step
+        self._cached_adoption_rate = None
 
     def run(self, n_steps=52):
         for _ in range(n_steps):
@@ -56,9 +61,16 @@ class WorkforceModel(mesa.Model):
         return self.datacollector.get_model_vars_dataframe()
 
     #Aggregate reporters 
+    def _compute_adoption_rate(self):
+        """Raw computation — called once per step and cached."""
+        adopted = sum(1 for a in self.agents if cast(WorkforceAgent, a).adoption_stage >= 3)
+        return adopted / len(self.agents)
+
     def get_adoption_rate(self):
-        adopted = self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage >= 3)
-        return len(adopted) / len(self.agents)
+        """Returns cached value during a step, computes fresh for DataCollector."""
+        if getattr(self, '_cached_adoption_rate', None) is not None:
+            return self._cached_adoption_rate
+        return self._compute_adoption_rate()
 
     def get_productivity_delta(self):   
         return float(np.mean([cast(WorkforceAgent, a).productivity for a in self.agents]))
@@ -87,23 +99,39 @@ class WorkforceModel(mesa.Model):
 
     #Network 
     def _seed_network(self, df):
-        # Connect agents whose collab_density is above the median
-        median = df['collab_density'].median()
-        high   = df[df['collab_density'] > median].index.tolist()
-        for i in range(len(high)):
-            for j in range(i + 1, min(i + 4, len(high))):
-                self.graph.add_edge(high[i], high[j])
+        # ── FIX #2 (CRITICAL): Cluster-based seeding (Social Proximity)
+        # Instead of CSV order, connect agents to peers in the same GMM cluster.
+        # This simulates teams/roles where contagion is most likely to happen.
+        for cluster_id in df['gmm_cluster'].unique():
+            cluster_agents = df[df['gmm_cluster'] == cluster_id].index.tolist()
+            for i in cluster_agents:
+                # Give each agent 4-6 random connections within their own cluster
+                # This ensures a high clustering coefficient within personas
+                peers = np.random.choice(cluster_agents, size=min(5, len(cluster_agents)), replace=False)
+                for peer in peers:
+                    if i != peer:
+                        self.graph.add_edge(i, peer)
 
     def _update_network(self):
         # Advocates link to Trial-stage peers — accelerates social norm spread
         # every week, advocates(stage=4), attempt to add 2 edges to random trial-stage agents(stage=2)
         # this causes the network to grow organically
-        advocates    = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 4))
-        trialing     = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 2))
-        if not trialing:
-            return
-        for adv in advocates:
-            peers = np.random.choice(trialing, size=min(2, len(trialing)), replace=False)
-            for peer in peers:
-                if not self.graph.has_edge(adv.unique_id, peer.unique_id):
-                    self.graph.add_edge(adv.unique_id, peer.unique_id) 
+        advocates = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 4))
+        trialing  = list(self.agents.select(lambda a: cast(WorkforceAgent, a).adoption_stage == 2))
+        if trialing:
+            for adv in advocates:
+                peers = np.random.choice(trialing, size=min(2, len(trialing)), replace=False)
+                for peer in peers:
+                    if not self.graph.has_edge(adv.unique_id, peer.unique_id):
+                        self.graph.add_edge(adv.unique_id, peer.unique_id)
+
+        # Disengaged agents shed edges (represents social withdrawal/quiet quitting)
+        # Any agent with frustration > 0.40 has a chance to drop a random edge
+        frustrated = list(self.agents.select(lambda a: cast(WorkforceAgent, a).frustration > 0.40))
+        for agent in frustrated:
+            # Random chance to drop edge per week of high frustration
+            if np.random.random() < 0.35: 
+                edges = list(self.graph.edges(agent.unique_id))
+                if edges:
+                    idx = np.random.randint(len(edges))
+                    self.graph.remove_edge(*edges[idx])
