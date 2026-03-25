@@ -67,7 +67,6 @@ def run_monte_carlo(scenario_config, n_runs=30, n_steps=52):
         tickets_p95       = ('ticket_volume',       lambda x: np.percentile(x, 95)),
         exs_mean          = ('exs_score',           'mean'),
         resistance_mean   = ('resistance_index',   'mean'),
-        network_density_mean = ('network_density',  'mean')
     ).reset_index(names='week')
 
     # ── FIX #1 (CRITICAL): productivity_mean is ABSOLUTE (≈0.63), not a delta.
@@ -209,7 +208,6 @@ if __name__ == '__main__':
     #   "Week 52" — the true step-52 end-state is never collected (collect() fires
     #   before agents step, so row 51 = state after 51 steps).
     # - resistance_mean is 0.0 for weeks 0–7. Only use for weeks 8+ analysis.
-    # - network_density / NDS: monotonically increasing — exclude from analytics.
     # - Scenario C label: "Pilot + Strong Management" (not "Hybrid Support").
 
     print('\nOutputs saved:')
