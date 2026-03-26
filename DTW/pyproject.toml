@@ -1,0 +1,19 @@
+[project]
+name = "dtw"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faker>=40.11.1",
+    "flask>=3.1.3",
+    "flask-cors>=6.0.2",
+    "matplotlib>=3.10.8",
+    "mesa>=3.5.1",
+    "networkx>=3.6.1",
+    "numpy>=2.4.3",
+    "pandas>=3.0.1",
+    "pyarrow>=23.0.1",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+]
