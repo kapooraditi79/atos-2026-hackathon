@@ -1,5 +1,14 @@
 # Digital Twin Workforce (DTW)
+---
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.12+-blue?logo=python&logoColor=white"/>
+  <img alt="Framework" src="https://img.shields.io/badge/ABM-Mesa_3.x-green?logo=python"/>
+  <img alt="Frontend" src="https://img.shields.io/badge/frontend-React_+_Plotly.js-purple?logo=react"/>
+  <img alt="API" src="https://img.shields.io/badge/api-Flask-grey?logo=flask"/>
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-orange"/>
+</p>
 
+---
 The Digital Twin Workforce (DTW) is a strategic simulation engine designed to model organizational behavior during technological transformations. By creating high-fidelity digital twins of 1,000+ employees, DTW enables leaders to test different rollout strategies (Chatbot-led, Phased, Top-down) and predict their impact on adoption, attrition, and financial ROI.
 
 ## 4-Layer Architecture
@@ -37,16 +46,6 @@ Our latest 12-month simulation (1,000 agents × 52 weeks) compared three distinc
 * **NPV**: £-12,226,312 (Negative)
 * **Attrition Risk**: High (113 at-risk agents due to 'Management Signal' friction)
 
----
-<p align="center">
-  <img alt="Python" src="https://img.shields.io/badge/python-3.12+-blue?logo=python&logoColor=white"/>
-  <img alt="Framework" src="https://img.shields.io/badge/ABM-Mesa_3.x-green?logo=python"/>
-  <img alt="Frontend" src="https://img.shields.io/badge/frontend-React_+_Plotly.js-purple?logo=react"/>
-  <img alt="API" src="https://img.shields.io/badge/api-Flask-grey?logo=flask"/>
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-orange"/>
-</p>
-
----
 
 ## Executive Summary
 
