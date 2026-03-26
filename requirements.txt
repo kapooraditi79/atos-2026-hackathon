@@ -1,7 +1,7 @@
 mesa==3.0.3
-pandas
+pandas==2.2.2
 numpy
 networkx
 scikit-learn
-pyarrow
+pyarrow==15.0.2
 matplotlib
