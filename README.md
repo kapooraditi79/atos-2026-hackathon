@@ -60,37 +60,5 @@ npm run dev
   uv run python -m backend.app  
   ```
 
-### CLI Usage
-
-Run a full simulation from the command line:
-
-```bash
-# Full simulation with IBM HR data
-python main.py HR_Data.csv --output-dir results
-
-# Fast run (skip sensitivity analysis)
-python main.py HR_Data.csv --output-dir results --skip-sensitivity
-```
-
-### API & Backend
-
-The DTW engine can be exposed via a Flask API:
-
-# Start the server
-python backend/app.py
-```
-
-API endpoints include `POST /api/simulate` for custom workforce uploads and scenario testing.
-
----
-
-## 🛠️ Development & Historical Fixes
-
-* **Layer 1 Isolation**: Fixed `main.py` crash by ensuring Layer 1 runs automatically for raw CSV inputs.
-* **Path Resolution**: Corrected Layer 4 parquet resolution to support arbitrary output directories.
-* **Performance**: The API uses a calibrated `n_runs=15` to ensure sub-90s execution for 1000 agents.
-* **Flexibility**: Added `--skip-sensitivity` to argparse for rapid iteration.
-
----
 
 *© 2026 Digital Twin Workforce Project*
