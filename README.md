@@ -2,7 +2,7 @@
 
 The Digital Twin Workforce (DTW) is a strategic simulation engine designed to model organizational behavior during technological transformations. By creating high-fidelity digital twins of 1,000+ employees, DTW enables leaders to test different rollout strategies (Chatbot-led, Phased, Top-down) and predict their impact on adoption, attrition, and financial ROI.
 
-## 🏗️ 4-Layer Architecture
+## 4-Layer Architecture
 
 DTW operates as a modular pipeline, transforming raw HR data into actionable strategic insights:
 
@@ -13,7 +13,7 @@ DTW operates as a modular pipeline, transforming raw HR data into actionable str
 
 ---
 
-## 📈 Latest Strategic Analysis
+## Latest Strategic Analysis
 
 Our latest 12-month simulation (1,000 agents × 52 weeks) compared three distinct rollout strategies:
 
@@ -39,7 +39,7 @@ Our latest 12-month simulation (1,000 agents × 52 weeks) compared three distinc
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
