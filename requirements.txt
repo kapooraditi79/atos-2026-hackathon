@@ -1,0 +1,8 @@
+mesa==3.0.3
+pandas==2.2.2
+numpy
+networkx
+scikit-learn
+pyarrow==15.0.2
+matplotlib
+scipy

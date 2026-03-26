@@ -1,0 +1,38 @@
+[
+  {
+    "param": "support_model",
+    "label": "Support Model (chatbot\u2192human)",
+    "low_val": "chatbot",
+    "high_val": "human",
+    "adoption_low": 0.382,
+    "adoption_high": 0.673,
+    "swing_pp": 29.1
+  },
+  {
+    "param": "training_intensity",
+    "label": "Training Intensity",
+    "low_val": 0.0,
+    "high_val": 1.0,
+    "adoption_low": 0.382,
+    "adoption_high": 0.382,
+    "swing_pp": 0.0
+  },
+  {
+    "param": "manager_signal",
+    "label": "Manager Signal",
+    "low_val": 0.2,
+    "high_val": 0.8,
+    "adoption_low": 0.382,
+    "adoption_high": 0.382,
+    "swing_pp": 0.0
+  },
+  {
+    "param": "tool_complexity",
+    "label": "Tool Complexity (lower = easier)",
+    "low_val": 0.8,
+    "high_val": 0.4,
+    "adoption_low": 0.382,
+    "adoption_high": 0.382,
+    "swing_pp": 0.0
+  }
+]

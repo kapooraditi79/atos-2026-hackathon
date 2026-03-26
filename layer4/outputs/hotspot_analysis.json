@@ -1,0 +1,58 @@
+{
+  "A": {
+    "scenario": "A",
+    "label": "Big-bang + Chatbot",
+    "n_hotspots": 86,
+    "total_agents": 1000,
+    "pct_hotspot": 8.6,
+    "interventions": [
+      {
+        "pattern": "High frustration + low stage + churn risk (23 agents)",
+        "root_cause": "Chatbot support p_fail=0.38 generates frustration faster than 0.90/wk decay. support_drag=0.08, adoption_friction=0.15. Traced to: L1 support_dependency \u00d7 L3 Poisson \u03bb \u00d7 p_fail.",
+        "intervention": "Improve chatbot KB for common ticket types (VPN, hardware). Target: reduce p_fail from 38% to 20%."
+      }
+    ],
+    "clusters": [
+      {
+        "cluster_id": 3,
+        "count": 86,
+        "mean_stage": 0.942,
+        "mean_frustration": 0.456,
+        "churn_risk_sum": 23.0,
+        "pct_of_hotspots": 100.0
+      }
+    ]
+  },
+  "B": {
+    "scenario": "B",
+    "label": "Phased + Human + Training",
+    "n_hotspots": 0,
+    "total_agents": 1000,
+    "pct_hotspot": 0.0,
+    "interventions": []
+  },
+  "C": {
+    "scenario": "C",
+    "label": "Pilot + Strong Management",
+    "n_hotspots": 43,
+    "total_agents": 1000,
+    "pct_hotspot": 4.3,
+    "interventions": [
+      {
+        "pattern": "High frustration + low stage + churn risk (13 agents)",
+        "root_cause": "Hybrid support p_fail=0.22 generates frustration faster than 0.90/wk decay. support_drag=0.03, adoption_friction=0.06. Traced to: L1 support_dependency \u00d7 L3 Poisson \u03bb \u00d7 p_fail.",
+        "intervention": "Hybrid support p_fail=22% is moderate. Consider adding dedicated Tier-1 human support for Cluster 3 agents to reduce unresolved ticket frustration."
+      }
+    ],
+    "clusters": [
+      {
+        "cluster_id": 3,
+        "count": 43,
+        "mean_stage": 0.977,
+        "mean_frustration": 0.415,
+        "churn_risk_sum": 13.0,
+        "pct_of_hotspots": 100.0
+      }
+    ]
+  }
+}
