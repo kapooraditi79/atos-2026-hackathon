@@ -49,7 +49,16 @@ Our latest 12-month simulation (1,000 agents × 52 weeks) compared three distinc
 
 ```bash
  npm create vite@latest frontend -- --template react
+# copy the contents of frontend.jsx into frontend/src/App.jsx
+# for subsequent runs
+cd frontend
+npm run dev
  ```
+- Backend Initialization
+  ```bash
+  # in root folder
+  uv run python -m backend.app  
+  ```
 
 ### CLI Usage
 
