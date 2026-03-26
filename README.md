@@ -45,6 +45,11 @@ Our latest 12-month simulation (1,000 agents × 52 weeks) compared three distinc
 
 - Python 3.10+
 - Recommended: `uv` or `pip` for dependency management.
+- Frontend intialization:
+
+```bash
+ npm create vite@latest frontend -- --template react
+ ```
 
 ### CLI Usage
 
@@ -61,10 +66,6 @@ python main.py HR_Data.csv --output-dir results --skip-sensitivity
 ### API & Backend
 
 The DTW engine can be exposed via a Flask API:
-
-```bash
-# Install dependencies
-pip install -r backend/requirements.txt
 
 # Start the server
 python backend/app.py
